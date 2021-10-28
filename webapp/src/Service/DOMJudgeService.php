@@ -110,6 +110,11 @@ class DOMJudgeService
      */
     protected $teamImages;
 
+    /**
+     * @var array
+     */
+    protected $teamLocationImages;
+
     const DATA_SOURCE_LOCAL = 0;
     const DATA_SOURCE_CONFIGURATION_EXTERNAL = 1;
     const DATA_SOURCE_CONFIGURATION_AND_LIVE_EXTERNAL = 2;
@@ -119,21 +124,6 @@ class DOMJudgeService
     // regex way more complicated and would also complicate the logic in ImportExportService::importContestYaml
     const EXTERNAL_IDENTIFIER_REGEX = '/^[a-zA-Z0-9_.-]+$/';
 
-    /**
-     * DOMJudgeService constructor.
-     *
-     * @param EntityManagerInterface        $em
-     * @param LoggerInterface               $logger
-     * @param RequestStack                  $requestStack
-     * @param ParameterBagInterface         $params
-     * @param AuthorizationCheckerInterface $authorizationChecker
-     * @param TokenStorageInterface         $tokenStorage
-     * @param HttpKernelInterface           $httpKernel
-     * @param ConfigurationService          $config
-     * @param RouterInterface               $router
-     * @param array                         $affiliationLogos
-     * @param array                         $teamImages
-     */
     public function __construct(
         EntityManagerInterface $em,
         LoggerInterface $logger,
@@ -145,7 +135,8 @@ class DOMJudgeService
         ConfigurationService $config,
         RouterInterface $router,
         array $affiliationLogos,
-        array $teamImages
+        array $teamImages,
+        array $teamLocationImages
     ) {
         $this->em                   = $em;
         $this->logger               = $logger;
@@ -158,6 +149,7 @@ class DOMJudgeService
         $this->router               = $router;
         $this->affiliationLogos     = $affiliationLogos;
         $this->teamImages           = $teamImages;
+        $this->teamLocationImages   = $teamLocationImages;
     }
 
     /**
@@ -1327,6 +1319,11 @@ class DOMJudgeService
                 $extension = 'jpg';
                 $var = $this->teamImages;
                 $dir = 'images/teams';
+                break;
+            case 'team_location':
+                $extension = 'png';
+                $var = $this->teamLocationImages;
+                $dir = 'images/team_locations';
                 break;
         }
 

@@ -36,6 +36,12 @@ class SetAssetInformationPass implements CompilerPassInterface
             'images/teams',
             'jpg'
         );
+        $this->registerDirectoryAssetParameter(
+            $container,
+            'domjudge.team_location_images',
+            'images/team_locations',
+            'png'
+        );
         $this->registerFileAssetParameter(
             $container,
             'domjudge.banner_exists',

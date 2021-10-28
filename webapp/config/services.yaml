@@ -26,6 +26,7 @@ services:
             $customJsFiles: '%domjudge.custom_js_files%'
             $affiliationLogos: '%domjudge.affiliations_logos%'
             $teamImages: '%domjudge.team_images%'
+            $teamLocationImages: '%domjudge.team_location_images%'
             $bannerExists: '%domjudge.banner_exists%'
 
     # makes classes in src/ available to be used as services

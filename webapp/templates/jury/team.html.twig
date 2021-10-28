@@ -166,6 +166,13 @@
              title="Picture of team {{ team.effectiveName }}">
         </div>
     {% endif %}
+    {% set teamLocationImage = team | teamLocationImage %}
+    {% if teamLocationImage %}
+        <div class="col">
+            <img id="teampicture" src="{{ asset(teamLocationImage) }}" alt="Location of team {{ team.name }}"
+                 title="Location of team {{ team.effectiveName }}">
+        </div>
+    {% endif %}
     </div>
 
     <p>

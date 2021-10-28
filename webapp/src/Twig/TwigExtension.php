@@ -10,6 +10,7 @@ use App\Entity\JudgingRun;
 use App\Entity\Language;
 use App\Entity\Submission;
 use App\Entity\SubmissionFile;
+use App\Entity\Team;
 use App\Entity\Testcase;
 use App\Service\ConfigurationService;
 use App\Service\DOMJudgeService;
@@ -184,6 +185,7 @@ class TwigExtension extends AbstractExtension implements GlobalsInterface
             new TwigFilter('fileTypeIcon', [$this, 'fileTypeIcon']),
             new TwigFilter('problemBadge', [$this, 'problemBadge'], ['is_safe' => ['html']]),
             new TwigFilter('printMetadata', [$this, 'printMetadata'], ['is_safe' => ['html']]),
+            new TwigFilter('teamLocationImage', [$this, 'teamLocationImage']),
         ];
     }
 
@@ -1268,5 +1270,18 @@ EOF;
             . '<i class="fas fa-exitcode" title="runtime"></i>'
             . 'exit-code: ' . $metadata['exitcode'];
         return $ret;
+    }
+
+    public function teamLocationImage(Team $team): ?string
+    {
+        if ($assetPath = $this->dj->assetPath((string)$team->getTeamid(), 'team_location')) {
+            return $assetPath;
+        }
+
+        if ($team->getRoom()) {
+            return $this->dj->assetPath($team->getRoom(), 'team_location');
+        }
+
+        return null;
     }
 }
