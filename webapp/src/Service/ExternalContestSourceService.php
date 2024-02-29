@@ -522,7 +522,8 @@ class ExternalContestSourceService
             case ExternalContestSource::TYPE_CCS_API:
                 try {
                     // The base URL is the URL of the CCS API root.
-                    if (preg_match('/^(.*\/)contests\/.*/',
+                    // Proper is '^(.*\/)contests\/.*/', but PC^2 doesn't expose this (yet).
+                    if (preg_match('/^(.*\/)contest(s\/.*)?/',
                                    $this->source->getSource(), $matches) === 0) {
                         $this->loadingError      = 'Cannot determine base URL. Did you pass a CCS API contest URL?';
                         $this->cachedContestData = null;
@@ -701,11 +702,11 @@ class ExternalContestSourceService
             $freezeHourModifier = $freezeNegative ? -1 : 1;
             $freezeInSeconds    = $freezeHourModifier * (int)$freezeData[2] * 3600
                 + 60 * (int)$freezeData[3]
-                + (double)sprintf('%d.%03d', $freezeData[4], $freezeData[5]);
+                + (double)sprintf('%d.%03d', $freezeData[4], $freezeData[5] ?? 0);
             $durationHourModifier = $durationNegative ? -1 : 1;
             $durationInSeconds    = $durationHourModifier * (int)$durationData[2] * 3600
                                     + 60 * (int)$durationData[3]
-                                    + (double)sprintf('%d.%03d', $durationData[4], $durationData[5]);
+                                    + (double)sprintf('%d.%03d', $durationData[4], $durationData[5] ?? 0);
             $freezeStartSeconds   = $durationInSeconds - $freezeInSeconds;
             $freezeHour           = floor($freezeStartSeconds / 3600);
             $freezeMinutes        = floor(($freezeStartSeconds % 3600) / 60);
@@ -1023,17 +1024,22 @@ class ExternalContestSourceService
         $this->removeWarning($event->type, $data->id, ExternalSourceWarning::TYPE_ENTITY_NOT_FOUND);
 
         $toCheckProblem = [
-            'name'      => $data->name,
-            'timelimit' => $data->timeLimit,
+            'name' => $data->name,
         ];
 
+        if ($data->timeLimit !== null) {
+            $toCheckProblem['timelimit'] = $data->timeLimit;
+        }
+
+        /* Disable as PC2 can have 2 problems with the same label
         if ($contestProblem->getShortname() !== $data->label) {
+        if ($contestProblem->getShortname() !== $data['label']) {
             $this->logger->warning(
                 'Contest problem short name does not match between feed (%s) and local (%s), updating',
                 [$data->label, $contestProblem->getShortname()]
             );
             $contestProblem->setShortname($data->label);
-        }
+        } */
         if ($contestProblem->getColor() !== ($data->rgb)) {
             $this->logger->warning(
                 'Contest problem color does not match between feed (%s) and local (%s), updating',
@@ -1435,7 +1441,7 @@ class ExternalContestSourceService
                     'message' => 'No source files in event',
                 ]);
                 $submissionDownloadSucceeded = false;
-            } elseif (($data->files[0]->mime ?? null) !== 'application/zip') {
+            } elseif ($data->files[0]->mime !== null && $data->files[0]->mime !== 'application/zip') {
                 $this->addOrUpdateWarning($event, $data->id, ExternalSourceWarning::TYPE_SUBMISSION_ERROR, [
                     'message' => 'Non-ZIP source files in event',
                 ]);
@@ -1444,6 +1450,10 @@ class ExternalContestSourceService
                 $zipUrl = $data->files[0]->href;
                 if (preg_match('/^https?:\/\//', $zipUrl) === 0) {
                     // Relative URL, prepend the base URL.
+                    // If both the base path ends with a / and the zip URL starts with one, drop one of them
+                    if (str_ends_with($this->basePath, '/') && str_starts_with($zipUrl, '/')) {
+                        $zipUrl = substr($zipUrl, 1);
+                    }
                     $zipUrl = ($this->basePath ?? '') . $zipUrl;
                 }
 
