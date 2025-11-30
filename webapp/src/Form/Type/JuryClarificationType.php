@@ -77,9 +77,7 @@ class JuryClarificationType extends AbstractType
             $namePrefix = '';
             if (!$hasCurrentContest) {
                 $namePrefix = $contestShortName . ' - ';
-                $subjectGroupBy = function (string $choice, string $key) {
-                    return substr($key, 0, strpos($key, '-'));
-                };
+                $subjectGroupBy = (fn(string $choice, string $key) => substr($key, 0, strpos($key, '-')));
             }
             foreach ($categories as $name => $desc) {
                 $subjectOptions["$namePrefix $desc"] = "$cid-$name";
@@ -115,7 +113,7 @@ class JuryClarificationType extends AbstractType
 
         $builder->add('jurymember', HiddenType::class, [
             'constraints' => [
-                new Callback([$this, 'checkJuryMember'])
+                new Callback($this->checkJuryMember(...))
             ]
         ]);
     }

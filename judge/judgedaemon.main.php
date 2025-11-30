@@ -240,7 +240,7 @@ class JudgeDaemon
         $domserver_languages = dj_json_decode($this->request('languages', 'GET'));
         foreach ($domserver_languages as $language) {
             $id = $language['id'];
-            if (key_exists($id, $this->langexts)) {
+            if (array_key_exists($id, $this->langexts)) {
                 $this->langexts[$id] = $language['extensions'];
             }
         }
@@ -551,7 +551,7 @@ class JudgeDaemon
         $this->endpoints[$this->endpointID]['retrying'] = false;
 
         logmsg(LOG_INFO,
-            "⇝ Received " . sizeof($row) . " '" . $type . "' judge tasks (endpoint $this->endpointID)");
+            "⇝ Received " . count($row) . " '" . $type . "' judge tasks (endpoint $this->endpointID)");
 
         if ($type == 'prefetch') {
             $this->handlePrefetchTask($row, $lastWorkdir, $workdirpath);
@@ -763,14 +763,14 @@ class JudgeDaemon
                 }
             }
             if ($trial == BACKOFF_STEPS) {
-                $errstr = $errstr . " Retry limit reached.";
+                $errstr .= " Retry limit reached.";
             } else {
                 $retry_in_sec = $delay_in_sec + BACKOFF_JITTER_SEC * random_int(0, mt_getrandmax()) / mt_getrandmax();
                 $warnstr = $errstr . " This request will be retried after about " .
                     round($retry_in_sec, 2) . "sec... (" . $trial . "/" . BACKOFF_STEPS . ")";
                 warning($warnstr);
                 dj_sleep($retry_in_sec);
-                $delay_in_sec = $delay_in_sec * BACKOFF_FACTOR;
+                $delay_in_sec *= BACKOFF_FACTOR;
             }
         }
         if (!$succeeded) {
@@ -865,7 +865,7 @@ class JudgeDaemon
             return false;
         }
 
-        $command = implode(' ', array_map('dj_escapeshellarg', $command_parts));
+        $command = implode(' ', array_map(dj_escapeshellarg(...), $command_parts));
 
         logmsg(LOG_DEBUG, "Executing command: $command");
         system($command, $retval_local);
@@ -917,7 +917,7 @@ class JudgeDaemon
         string $hash,
         bool   $combined_run_compare = false
     ): array {
-        $execdir = join('/', [
+        $execdir = implode('/', [
             $workdirpath,
             'executable',
             $type,
@@ -959,8 +959,8 @@ class JudgeDaemon
             unset($files);
             uasort($filesArray, fn(array $a, array $b) => strcmp($a['filename'], $b['filename']));
             $computedHash = md5(
-                join(
-                    array_map(
+                implode(
+                    '', array_map(
                         fn($file) => $file['hash'] . $file['filename'] . $file['is_executable'],
                         $filesArray
                     )
@@ -1767,10 +1767,10 @@ class JudgeDaemon
 
     private function initsignals(): void
     {
-        pcntl_signal(SIGTERM, [self::class, 'signalHandler']);
-        pcntl_signal(SIGINT, [self::class, 'signalHandler']);
-        pcntl_signal(SIGHUP, [self::class, 'signalHandler']);
-        pcntl_signal(SIGUSR1, [self::class, 'signalHandler']);
+        pcntl_signal(SIGTERM, self::signalHandler(...));
+        pcntl_signal(SIGINT, self::signalHandler(...));
+        pcntl_signal(SIGHUP, self::signalHandler(...));
+        pcntl_signal(SIGUSR1, self::signalHandler(...));
     }
 }
 

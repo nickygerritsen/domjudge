@@ -303,9 +303,7 @@ class SubmissionController extends BaseController
                 ->setParameter('type', JudgeTaskType::JUDGING_RUN)
                 ->getQuery()
                 ->getResult();
-            $timelimits = array_map(function (JudgeTask $task) {
-                return Utils::jsonDecode($task->getRunConfig())['time_limit'];
-            }, $judgeTasks);
+            $timelimits = array_map(fn(JudgeTask $task) => Utils::jsonDecode($task->getRunConfig())['time_limit'], $judgeTasks);
         }
 
         $selectedJudging = null;

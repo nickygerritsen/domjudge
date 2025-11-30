@@ -788,7 +788,7 @@ class ProblemController extends BaseController
         if (!empty($lockedContests)) {
             $this->addFlash('warning',
                 'Problem belongs to locked contest ('
-                . implode($lockedContests)
+                . implode('', $lockedContests)
                 . ', disallowing editing.');
         }
         $data = [
