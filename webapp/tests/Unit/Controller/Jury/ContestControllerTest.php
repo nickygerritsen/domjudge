@@ -411,7 +411,7 @@ class ContestControllerTest extends JuryControllerTestCase
                 // Get the underlying object to inject elements not currently in the DOM.
                 $rawValues = $form->getPhpValues();
                 foreach ([static::$addEntities[0], $element] as $item) {
-                    if (key_exists(static::$addPlus, $item)) {
+                    if (array_key_exists(static::$addPlus, $item)) {
                         $rawValues[$formName . static::$addPlus . ']'] = $item[static::$addPlus];
                     }
                 }

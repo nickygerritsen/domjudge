@@ -85,11 +85,11 @@ class LanguagesControllerTest extends JuryControllerTestCase
     public function helperProvideTranslateAddEntity(array $entity, array $expected): array
     {
         // For LanguageController the values for external identifier should follow internal
-        if (key_exists('langid', $entity)) {
-            if (!key_exists('externalid', $entity)) {
+        if (array_key_exists('langid', $entity)) {
+            if (!array_key_exists('externalid', $entity)) {
                 $entity['externalid'] = $entity['langid'];
             }
-            if (!key_exists('externalid', $expected)) {
+            if (!array_key_exists('externalid', $expected)) {
                 $expected['externalid'] = $entity['langid'];
             }
         }

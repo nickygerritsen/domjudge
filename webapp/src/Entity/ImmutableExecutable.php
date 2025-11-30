@@ -77,7 +77,7 @@ class ImmutableExecutable
         uasort($filesArray, fn(ExecutableFile $a, ExecutableFile $b) => strcmp($a->getFilename(), $b->getFilename()));
         $this->hash = md5(
             implode(
-                array_map(
+                '', array_map(
                     fn(ExecutableFile $file) => $file->getHash() . $file->getFilename() . $file->isExecutable(),
                     $filesArray
                 )

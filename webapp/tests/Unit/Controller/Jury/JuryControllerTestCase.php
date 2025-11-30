@@ -261,7 +261,7 @@ abstract class JuryControllerTestCase extends BaseTestCase
             $formId = str_replace('.', '][', $id);
             $formFields[static::$addForm . $formId . "]"] = $field;
             // For LanguageController the values for external identifier should follow internal
-            if (key_exists('langid', $element) && !key_exists('externalid', $element)) {
+            if (array_key_exists('langid', $element) && !array_key_exists('externalid', $element)) {
                 $formFields[static::$addForm . 'externalid]'] = $element['langid'];
             }
         }
@@ -282,7 +282,7 @@ abstract class JuryControllerTestCase extends BaseTestCase
         }
         // Get the underlying object to inject elements not currently in the DOM.
         $rawValues = $form->getPhpValues();
-        if (key_exists(static::$addPlus, $element)) {
+        if (array_key_exists(static::$addPlus, $element)) {
             $rawValues[$formName][static::$addPlus] = $element[static::$addPlus];
         }
         return $this->client->request($form->getMethod(), $form->getUri(), $rawValues, $form->getPhpFiles());
@@ -526,7 +526,7 @@ abstract class JuryControllerTestCase extends BaseTestCase
                 if (in_array(array_key_first($element), static::$editEntitiesSkipFields)) {
                     continue;
                 }
-                if (key_exists('externalid', $element)) {
+                if (array_key_exists('externalid', $element)) {
                     continue;
                 }
                 [$formdataKeys, $formdataValues] = $this->helperProvideMergeEditEntity($element);
